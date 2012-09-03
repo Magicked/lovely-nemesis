@@ -5,8 +5,10 @@ function game:init()
 	require "projectiles/bullet"
 	require "geometry/tile"
 	require "utilities/camera"
+	require "engine/level"
 
-	worldMeter = 64
+	worldMeter = 32
+	tileSize = 32
 	self:loadLevel() -- load the level and world before we load the player
 
 	camera = camera:new(0, 0)
@@ -58,24 +60,24 @@ end
 
 function game:loadLevel()
 	self:loadEntTables()
-	self:generateZone()
+	self:generateLevel()
 end
 
-function game:generateZone()
+function game:generateLevel()
 	print("Creating new physics world")
-	worldsize = worldsize or 16384
+	worldTileWidth = 400
+	worldTileHeight = 400
+	worldWidth = tileSize * worldTileWidth
+	worldHeight = tileSize * worldTileHeight
 	-- create the actual world
-	world = love.physics.newWorld(0, 0, worldsize, worldsize)
+	world = love.physics.newWorld(0, 0, worldWidth, worldHeight)
 	world:setGravity(0, worldMeter * 9.81)
 	world:setCallbacks(add, persist, remove)
 	love.physics.setMeter(worldMeter)
 
-	-- Create our physics objects
-	local size = 32
-	for i = 0, 20, 1 do
-		local tile = tile:new(i * size, 600, size, size)
-		table.insert(ent.geometry.tile, tile)
-	end
+	local level = level:new()
+	level:generate()
+	table.insert(ent.level, level)
 end
 
 function game:loadEntTables()
@@ -91,5 +93,6 @@ function game:loadEntTables()
 		geometry = {
 			tile = {},
 		},
+		level = {},
 	}
 end
