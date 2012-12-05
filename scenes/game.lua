@@ -71,7 +71,8 @@ function game:generateLevel()
 	worldHeight = tileSize * worldTileHeight
 	-- create the actual world
 	world = love.physics.newWorld(0, 0, worldWidth, worldHeight)
-	world:setGravity(0, worldMeter * 9.81)
+	-- world:setGravity(0, worldMeter * 9.81)
+	world:setGravity(0, 0)
 	world:setCallbacks(add, persist, remove)
 	love.physics.setMeter(worldMeter)
 

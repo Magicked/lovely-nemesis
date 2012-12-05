@@ -38,8 +38,8 @@ function bullet:update(dt)
 	if self.timer > self.alive_time then
 		self.alive = false
 		self.body:destroy()
-		self.shape:destroy()
 	end
+	self.timer = self.timer + dt
 end
 
 function bullet:isAlive()
