@@ -3,11 +3,15 @@ player = class:new()
 function player:init(x, y)
 	self.x = x
     self.y = y
-    self.width = 16
-    self.height = 32
+ 
     self.var_thrust = 200
+    self.var_brake = 10
     self.max_rotation = 1 -- radians/sec
     self:initkeys()
+
+    self.image = love.graphics.newImage("/images/spaceships/tiny_ship.png")
+    self.width = self.image:getWidth()
+    self.height = self.image:getHeight()
 
     -- Create our physics objects
 	self.xloc = x + self.width / 2
@@ -61,28 +65,29 @@ function player:draw()
 	local ox = self.width / 2
 	local oy = self.height / 2
 	--love.graphics.draw(self.image, self.body:getX(), self.body:getY(), self.body:getAngle(), 1, 1, ox, oy, 0, 0)
-	love.graphics.setColor(255, 255, 0)
-	love.graphics.rectangle("fill", self.body:getX() - ox, self.body:getY() - oy, self.width, self.height)
+	--love.graphics.setColor(255, 255, 0)
+	love.graphics.draw(self.image, self.body:getX() - ox, self.body:getY() - oy, self.body:getAngle(), 1, 1, 0, 0, 0, 0)
+	--love.graphics.rectangle("fill", self.body:getX() - ox, self.body:getY() - oy, self.width, self.height)
 	--love.graphics.draw(self.image, self.x, self.y, 0, 1, 1, 0, 0, 0, 0)
 end
 
 function player:check_keyboard()
-	for k,v in ipairs(self.keytable) do
-		v = false
+	for _,key in pairs(self.keys) do
+		self.keytable[key] = false
 	end
 
-	self.keytable.thrust = false
+	--self.keytable.thrust = false
 	if love.keyboard.isDown("w") then
-		self.keytable.thrust = true
+		self.keytable["thrust"] = true
 	end
 	if love.keyboard.isDown("a") then
-		self.keytable.rotate_left = true
+		self.keytable["rotate_left"] = true
 	end
 	if love.keyboard.isDown("s") then
-		self.keytable.brake = true
+		self.keytable["brake"] = true
 	end
 	if love.keyboard.isDown("d") then
-		self.keytable.rotate_right = true
+		self.keytable["rotate_right"] = true
 	end
 end
 
@@ -91,7 +96,11 @@ function player:keypressed(key)
 end
 
 function player:brake(dt)
-
+	local vx, vy = self.body:getLinearVelocity()
+	local angle = math.atan2(vx, vy)
+	bx = math.cos(angle) * self.var_brake * dt
+	by = math.sin(angle) * self.var_brake * dt
+	self.body:applyForce(bx, by)
 end
 
 function player:thrust(dt)
@@ -122,9 +131,9 @@ end
 
 function player:initkeys()
 	self.keytable = {}
-	self.keytable.rotate_right = false
-	self.keytable.rotate_left = false
-	self.keytable.thrust = false
-	self.keytable.brake = false
-	self.keytable.fire = false
+	self.keys = { "rotate_right", "rotate_left", "thrust", "brake", "fire" }
+
+	for _,key in pairs(self.keys) do
+		self.keytable[key] = false
+	end
 end
