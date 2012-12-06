@@ -5,7 +5,7 @@ function player:init(x, y)
     self.y = y
  
     self.var_thrust = 200
-    self.var_brake = 10
+    self.var_brake = 5
     self.max_rotation = 1 -- radians/sec
     self:initkeys()
 
@@ -97,10 +97,13 @@ end
 
 function player:brake(dt)
 	local vx, vy = self.body:getLinearVelocity()
-	local angle = math.atan2(vx, vy)
-	bx = math.cos(angle) * self.var_brake * dt
-	by = math.sin(angle) * self.var_brake * dt
-	self.body:applyForce(bx, by)
+	bx = -vx * self.var_brake * dt
+	by = -vy * self.var_brake * dt
+	if math.abs(bx) < .5 and math.abs(by) < .5 then
+		self.body:setLinearVelocity(0, 0)
+	else
+		self.body:applyForce(bx, by)
+	end
 end
 
 function player:thrust(dt)
