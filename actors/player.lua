@@ -27,24 +27,7 @@ function player:update(dt)
 	self:check_keyboard()
 	--local curX = self.body:getX()
 	--local curY = self.body:getY()
-	if love.mouse.isDown("l") then
-		local xstart = self.body:getX()
-		local ystart = self.body:getY()
-		local tx = love.mouse.getX() - camera:getTransX()
-		local ty = love.mouse.getY() - camera:getTransY()
-		if tx > xstart then
-			xstart = xstart + self.width / 2 + 2
-		else
-			xstart = xstart - self.width / 2 - 2
-		end
-		if ty > ystart then
-			ystart = ystart + self.height / 2 + 2
-		else
-			ystart = ystart - self.height / 2 - 2
-		end
-		local bullet = bullet:new(xstart, ystart, tx, ty)
-	    table.insert(ent.projectile.bullet, bullet)
-    end
+
 
     if self.keytable.thrust and not self.keytable.brake then
     	self:thrust(dt)
@@ -57,6 +40,9 @@ function player:update(dt)
     end
     if self.keytable.rotate_right and not self.keytable.rotate_left then
     	self:rotate_right(dt)
+    end
+    if self.keytable.fire then
+    	self:fire(dt)
     end
 end
 
@@ -89,6 +75,9 @@ function player:check_keyboard()
 	if love.keyboard.isDown("d") then
 		self.keytable["rotate_right"] = true
 	end
+	if love.keyboard.isDown(" ") then
+		self.keytable["fire"] = true
+	end
 end
 
 function player:keypressed(key)
@@ -114,12 +103,29 @@ end
 
 function player:rotate_left(dt)
 	self.body:setAngle(self.body:getAngle() - self.max_rotation * dt)
-	--self.body:applyForce(-self.speed * dt, 0)
 end
 
 function player:rotate_right(dt)
 	self.body:setAngle(self.body:getAngle() + self.max_rotation * dt)
-	--self.body:applyForce(self.speed * dt, 0)
+end
+
+function player:fire(dt)
+	local xstart = self.body:getX()
+	local ystart = self.body:getY()
+	local tx = love.mouse.getX() - camera:getTransX()
+	local ty = love.mouse.getY() - camera:getTransY()
+	if tx > xstart then
+		xstart = xstart + self.width / 2 + 2
+	else
+		xstart = xstart - self.width / 2 - 2
+	end
+	if ty > ystart then
+		ystart = ystart + self.height / 2 + 2
+	else
+		ystart = ystart - self.height / 2 - 2
+	end
+	local bullet = bullet:new(xstart, ystart, tx, ty)
+    table.insert(ent.projectile.bullet, bullet)
 end
 
 function player:getCenterX()
