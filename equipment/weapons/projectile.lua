@@ -5,15 +5,15 @@ projectile = class:new()
 function projectile:init(name, parent)
 	self.name = name
 	self.parent = parent
-	self.config = {}
-	assert(loadfile("lovely-nemesis/equipment/weapons/configs/"..name..".lua"))
+	loaded_chunk = assert(loadfile("lovely-nemesis/equipment/weapons/configs/"..name..".lua"))
+	loaded_chunk()
 	self.last_fire = 0
 end
 
 function projectile:fire(dt)
 	self.last_fire = self.last_fire + dt
-	if self.last_fire > 1 / self.config.rof then
-		self.last_fire = self.last_fire - 1 / self.config.rof
+	if self.last_fire > 1 / weapons.config.proj_tiny_auto.rof then
+		self.last_fire = self.last_fire - 1 / weapons.config.proj_tiny_auto.rof
 		print "fire"
 	end
 end
