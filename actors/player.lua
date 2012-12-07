@@ -17,6 +17,7 @@ function player:init(x, y)
     self.weapons = {}
     local weapon = projectile:new("proj_tiny_auto", self)
     table.insert(self.weapons, weapon)
+    self.selected_weapon = self.weapons[1]
 
     -- Create our physics objects
 	self.xloc = x + self.width / 2
@@ -115,6 +116,10 @@ function player:rotate_right(dt)
 end
 
 function player:fire(dt)
+	for k,v in pairs(self.weapons) do
+		local sweap = self.weapons[k]
+		sweap:fire(dt)
+	end
 	local xstart = self.body:getX()
 	local ystart = self.body:getY()
 	local tx = love.mouse.getX() - camera:getTransX()
