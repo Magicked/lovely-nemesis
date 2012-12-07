@@ -1,6 +1,8 @@
 player = class:new()
 
 function player:init(x, y)
+	require "equipment/weapons/projectile"
+
 	self.x = x
     self.y = y
  
@@ -12,6 +14,9 @@ function player:init(x, y)
     self.image = love.graphics.newImage("/images/spaceships/tiny_ship.png")
     self.width = self.image:getWidth()
     self.height = self.image:getHeight()
+    self.weapons = {}
+    local weapon = projectile:new("proj_tiny_auto", self)
+    table.insert(self.weapons, weapon)
 
     -- Create our physics objects
 	self.xloc = x + self.width / 2
