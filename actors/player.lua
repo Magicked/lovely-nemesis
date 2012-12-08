@@ -139,13 +139,13 @@ function player:fire(dt)
 end
 
 function player:getCenterX()
-	--return self.body:getX()
-	return self.xloc
+	return self.body:getX()
+	--return self.xloc
 end
 
 function player:getCenterY()
-	--return self.body:getY()
-	return self.yloc
+	return self.body:getY()
+	--return self.yloc
 end
 
 function player:initkeys()

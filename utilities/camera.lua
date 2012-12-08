@@ -11,6 +11,7 @@ function camera:init(x, y)
 		modifier = 1
 	}
 	following = {}
+	print "Initializing camera"
 end
 
 function camera:draw()

@@ -12,6 +12,7 @@ function game:init()
 	self:loadLevel() -- load the level and world before we load the player
 
 	camera = camera:new(0, 0)
+	background = love.graphics.newImage("/images/backgrounds/space1.jpg")
 	local player = player:new(100,100)
 	table.insert(ent.actor.player, player)
 	camera:setFollow(player)
@@ -37,6 +38,7 @@ end
 function game:draw()
 	love.graphics.setColor(255, 255, 255)
     love.graphics.print("FPS: " .. love.timer.getFPS(), 50, 50)
+    love.graphics.draw(background, 0, 0)
 
     camera:draw()
 	for k,bullet in ipairs(ent.projectile.bullet) do
