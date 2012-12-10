@@ -38,7 +38,7 @@ end
 function game:draw()
 	love.graphics.setColor(255, 255, 255)
     love.graphics.print("FPS: " .. love.timer.getFPS(), 50, 50)
-    love.graphics.draw(background, 0, 0)
+    love.graphics.draw(background, 0, 0, 0, .5)
 
     camera:draw()
 	for k,bullet in ipairs(ent.projectile.bullet) do

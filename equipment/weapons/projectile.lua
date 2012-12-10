@@ -11,9 +11,9 @@ function projectile:init(name, parent)
 end
 
 function projectile:fire(dt)
-	self.last_fire = self.last_fire + dt
-	if self.last_fire > 1 / weapons.config.proj_tiny_auto.rof then
-		self.last_fire = self.last_fire - 1 / weapons.config.proj_tiny_auto.rof
+	local current_time = love.timer.getMicroTime()
+	if current_time - self.last_fire > 1 / weapons.config.proj_tiny_auto.rof then
+		self.last_fire = current_time
 		print "fire"
 	end
 end
