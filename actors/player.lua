@@ -135,8 +135,8 @@ function player:fire(dt)
 	else
 		ystart = ystart - self.height / 2 - 2
 	end
-	local bullet = bullet:new(xstart, ystart, tx, ty)
-    table.insert(ent.projectile.bullet, bullet)
+	--local bullet = bullet:new(xstart, ystart, tx, ty)
+    --table.insert(ent.projectile.bullet, bullet)
 end
 
 function player:getCenterX()
