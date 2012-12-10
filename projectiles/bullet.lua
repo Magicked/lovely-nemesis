@@ -25,6 +25,7 @@ function bullet:init(x, y, tx, ty)
 	self.shape = love.physics.newCircleShape(self.radius)
 	self.fixture = love.physics.newFixture(self.body, self.shape, 1)
 	self.fixture:setRestitution(0.1)
+	self.fixture:setUserData("Bullet")
 	self.body:applyForce(self.xnorm * self.speed, self.ynorm * self.speed)
 	print("Position: " .. x + self.radius .. ", " .. y + self.radius .. " -- Force: " .. self.xnorm * self.speed .. ", " .. self.ynorm * self.speed)
 end

@@ -16,6 +16,8 @@ function game:init()
 	local player = player:new(100,100)
 	table.insert(ent.actor.player, player)
 	camera:setFollow(player)
+	text = ""
+	persisting = 0
 end
 
 function game:update(dt)
@@ -32,13 +34,18 @@ function game:update(dt)
 	    end
 	end
 
+	if string.len(text) > 768 then    -- cleanup when 'text' gets too long
+        text = "" 
+    end
+
 	world:update(dt)
 end
 
 function game:draw()
 	love.graphics.setColor(255, 255, 255)
+	love.graphics.draw(background, 0, 0, 0, .5)
     love.graphics.print("FPS: " .. love.timer.getFPS(), 50, 50)
-    love.graphics.draw(background, 0, 0, 0, .5)
+    love.graphics.print(text, 10, 10)
 
     camera:draw()
 	for k,bullet in ipairs(ent.projectile.bullet) do
@@ -75,7 +82,9 @@ function game:generateLevel()
 	world = love.physics.newWorld(0, 0, worldWidth, worldHeight)
 	-- world:setGravity(0, worldMeter * 9.81)
 	world:setGravity(0, 0)
-	world:setCallbacks(add, persist, remove)
+	world:setCallbacks(beginContact, endContact, preSolve, postSolve)
+	text = ""
+	persisting = 0
 	love.physics.setMeter(worldMeter)
 
 	local level = level:new()
@@ -98,4 +107,34 @@ function game:loadEntTables()
 		},
 		level = {},
 	}
+end
+
+function beginContact(a, b, coll)
+    local x,y = coll:getNormal()
+    if a:getUserData() ~= nil and b:getUserData() ~= nil then
+    	text = text.."\n"..a:getUserData().." colliding with "..b:getUserData().." with a vector normal of: "..x..", "..y
+    end
+end
+
+
+function endContact(a, b, coll)
+    persisting = 0    -- reset since they're no longer touching
+    if a:getUserData() ~= nil and b:getUserData() ~= nil then
+    	text = text.."\n"..a:getUserData().." uncolliding with "..b:getUserData()
+    end
+end
+
+function preSolve(a, b, coll)
+	if a:getUserData() ~= nil and b:getUserData() ~= nil then
+	    if persisting == 0 then    -- only say when they first start touching
+	        text = text.."\n"..a:getUserData().." touching "..b:getUserData()
+	    elseif persisting < 20 then    -- then just start counting
+	        text = text.." "..persisting
+	    end
+	    persisting = persisting + 1    -- keep track of how many updates they've been touching for
+	end
+end
+
+function postSolve(a, b, coll)
+-- we won't do anything with this function
 end

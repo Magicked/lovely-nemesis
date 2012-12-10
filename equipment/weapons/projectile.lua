@@ -14,6 +14,8 @@ function projectile:fire(dt)
 	local current_time = love.timer.getMicroTime()
 	if current_time - self.last_fire > 1 / weapons.config.proj_tiny_auto.rof then
 		self.last_fire = current_time
-		print "fire"
+		--local bullet = bullet:new(xstart, ystart, tx, ty)
+		--bullet:ignore_target(self.parent)
+    	--table.insert(ent.projectile.bullet, bullet)
 	end
 end
