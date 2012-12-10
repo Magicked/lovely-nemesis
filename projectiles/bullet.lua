@@ -25,7 +25,10 @@ function bullet:init(x, y, tx, ty)
 	self.shape = love.physics.newCircleShape(self.radius)
 	self.fixture = love.physics.newFixture(self.body, self.shape, 1)
 	self.fixture:setRestitution(0.1)
-	self.fixture:setUserData("Bullet")
+	self.userData = {}
+	self.userData['name'] = "bullet"
+	self.userData['ignore_collisions'] = {}
+	self.id = 
 	self.body:applyForce(self.xnorm * self.speed, self.ynorm * self.speed)
 	print("Position: " .. x + self.radius .. ", " .. y + self.radius .. " -- Force: " .. self.xnorm * self.speed .. ", " .. self.ynorm * self.speed)
 end
@@ -45,4 +48,9 @@ end
 
 function bullet:isAlive()
 	return self.alive
+end
+
+function bullet:ignoreTarget(object)
+	table.insert(self.userData['ignore_collisions'], object)
+	self.fixture:setUserData(self.userData)
 end

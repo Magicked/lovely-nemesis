@@ -110,31 +110,42 @@ function game:loadEntTables()
 end
 
 function beginContact(a, b, coll)
-    local x,y = coll:getNormal()
+	if coll:isEnabled() then
+		print "Enabled"
+		coll:setEnabled(false)
+	end
+	return nil
+    --[[local x,y = coll:getNormal()
     if a:getUserData() ~= nil and b:getUserData() ~= nil then
+    	aud = a:getUserData() 
+    	bud = b:getUserData()
+    	--if aud['ignore']
     	text = text.."\n"..a:getUserData().." colliding with "..b:getUserData().." with a vector normal of: "..x..", "..y
-    end
+    end]]
 end
 
 
 function endContact(a, b, coll)
-    persisting = 0    -- reset since they're no longer touching
+	return nil
+    --[[persisting = 0    -- reset since they're no longer touching
     if a:getUserData() ~= nil and b:getUserData() ~= nil then
     	text = text.."\n"..a:getUserData().." uncolliding with "..b:getUserData()
-    end
+    end]]
 end
 
 function preSolve(a, b, coll)
-	if a:getUserData() ~= nil and b:getUserData() ~= nil then
+	return nil
+	--[[if a:getUserData() ~= nil and b:getUserData() ~= nil then
 	    if persisting == 0 then    -- only say when they first start touching
 	        text = text.."\n"..a:getUserData().." touching "..b:getUserData()
 	    elseif persisting < 20 then    -- then just start counting
 	        text = text.." "..persisting
 	    end
 	    persisting = persisting + 1    -- keep track of how many updates they've been touching for
-	end
+	end]]
 end
 
 function postSolve(a, b, coll)
+	return nil
 -- we won't do anything with this function
 end
