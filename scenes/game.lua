@@ -12,6 +12,7 @@ function game:init()
 	self:loadLevel() -- load the level and world before we load the player
 
 	camera = camera:new(0, 0)
+	id_generator = id_generator:new()
 	background = love.graphics.newImage("/images/backgrounds/space1.jpg")
 	local player = player:new(100,100)
 	table.insert(ent.actor.player, player)
