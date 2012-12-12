@@ -19,7 +19,7 @@ function projectile:fire(dt)
 		local tx = love.mouse.getX() - camera:getTransX()
 		local ty = love.mouse.getY() - camera:getTransY()
 		local bullet = bullet:new(xstart, ystart, tx, ty)
-		bullet:ignoreTarget(self.parent)
+		bullet:ignoreTarget(self.parent:getID())
     	table.insert(ent.projectile.bullet, bullet)
 	end
 end

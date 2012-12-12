@@ -19,6 +19,8 @@ function player:init(x, y)
     table.insert(self.weapons, weapon)
     self.selected_weapon = self.weapons[1]
 
+    self.id = id_generator:getID()
+
     -- Create our physics objects
 	self.xloc = x + self.width / 2
     self.yloc = y + self.height / 2
@@ -26,15 +28,17 @@ function player:init(x, y)
 	self.shape = love.physics.newRectangleShape(self.width, self.height)
 	self.fixture = love.physics.newFixture(self.body, self.shape, 1)
 	self.fixture:setRestitution(0.1)
-	self.fixture:setUserData("Player")
 
+	self.userData = {}
+	self.userData['id'] = self.id
+	self.userData['name'] = "player"
+	self.fixture:setUserData(self.userData)
 end
 
 function player:update(dt)
 	self:check_keyboard()
 	--local curX = self.body:getX()
 	--local curY = self.body:getY()
-
 
     if self.keytable.thrust and not self.keytable.brake then
     	self:thrust(dt)
@@ -156,4 +160,8 @@ function player:initkeys()
 	for _,key in pairs(self.keys) do
 		self.keytable[key] = false
 	end
+end
+
+function player:getID()
+	return self.id
 end

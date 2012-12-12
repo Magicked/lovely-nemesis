@@ -6,6 +6,7 @@ function game:init()
 	require "geometry/tile"
 	require "utilities/camera"
 	require "engine/level"
+	require "utilities/id_generator"
 
 	worldMeter = 32
 	tileSize = 32
@@ -111,15 +112,34 @@ function game:loadEntTables()
 end
 
 function beginContact(a, b, coll)
-	if coll:isEnabled() then
-		print "Enabled"
-		coll:setEnabled(false)
-	end
+	if a:getUserData() ~= nil and b:getUserData() ~= nil then
+		print "Checking collisions"
+		aud = a:getUserData() 
+    	bud = b:getUserData()
+    	if aud['ignore_collisions'] and bud['id'] then
+			for _,value in pairs(aud['ignore_collisions']) do
+				if value == bud['id'] then
+					coll:setEnabled(false)
+					return nil
+				end
+			end
+    	end
+    	if bud['ignore_collisions'] and aud['id'] then
+			for _,value in pairs(bud['ignore_collisions']) do
+				if value == aud['id'] then
+					coll:setEnabled(false)
+					return nil
+				end
+			end
+    	end
+    end
+	--if coll:isEnabled() then
+	--	coll:setEnabled(false)
+	--end
 	return nil
     --[[local x,y = coll:getNormal()
-    if a:getUserData() ~= nil and b:getUserData() ~= nil then
-    	aud = a:getUserData() 
-    	bud = b:getUserData()
+    
+    	
     	--if aud['ignore']
     	text = text.."\n"..a:getUserData().." colliding with "..b:getUserData().." with a vector normal of: "..x..", "..y
     end]]

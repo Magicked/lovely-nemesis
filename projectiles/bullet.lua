@@ -28,7 +28,9 @@ function bullet:init(x, y, tx, ty)
 	self.userData = {}
 	self.userData['name'] = "bullet"
 	self.userData['ignore_collisions'] = {}
-	self.id = id_generator:get_id()
+	self.id = id_generator:getID()
+	self.userData['id'] = self.id
+	self.fixture:setUserData(self.userData)
 	self.body:applyForce(self.xnorm * self.speed, self.ynorm * self.speed)
 	print("Position: " .. x + self.radius .. ", " .. y + self.radius .. " -- Force: " .. self.xnorm * self.speed .. ", " .. self.ynorm * self.speed)
 end
@@ -50,7 +52,11 @@ function bullet:isAlive()
 	return self.alive
 end
 
-function bullet:ignoreTarget(object)
-	table.insert(self.userData['ignore_collisions'], object)
+function bullet:ignoreTarget(id)
+	table.insert(self.userData['ignore_collisions'], id)
 	self.fixture:setUserData(self.userData)
+end
+
+function bullet:getID()
+	return self.id
 end
