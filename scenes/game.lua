@@ -18,8 +18,6 @@ function game:init()
 	local player = player:new(100,100)
 	table.insert(ent.actor.player, player)
 	camera:setFollow(player)
-	text = ""
-	persisting = 0
 end
 
 function game:update(dt)
@@ -85,8 +83,6 @@ function game:generateLevel()
 	-- world:setGravity(0, worldMeter * 9.81)
 	world:setGravity(0, 0)
 	world:setCallbacks(beginContact, endContact, preSolve, postSolve)
-	text = ""
-	persisting = 0
 	love.physics.setMeter(worldMeter)
 
 	local level = level:new()
@@ -133,40 +129,17 @@ function beginContact(a, b, coll)
 			end
     	end
     end
-	--if coll:isEnabled() then
-	--	coll:setEnabled(false)
-	--end
 	return nil
-    --[[local x,y = coll:getNormal()
-    
-    	
-    	--if aud['ignore']
-    	text = text.."\n"..a:getUserData().." colliding with "..b:getUserData().." with a vector normal of: "..x..", "..y
-    end]]
 end
-
 
 function endContact(a, b, coll)
 	return nil
-    --[[persisting = 0    -- reset since they're no longer touching
-    if a:getUserData() ~= nil and b:getUserData() ~= nil then
-    	text = text.."\n"..a:getUserData().." uncolliding with "..b:getUserData()
-    end]]
 end
 
 function preSolve(a, b, coll)
 	return nil
-	--[[if a:getUserData() ~= nil and b:getUserData() ~= nil then
-	    if persisting == 0 then    -- only say when they first start touching
-	        text = text.."\n"..a:getUserData().." touching "..b:getUserData()
-	    elseif persisting < 20 then    -- then just start counting
-	        text = text.." "..persisting
-	    end
-	    persisting = persisting + 1    -- keep track of how many updates they've been touching for
-	end]]
 end
 
 function postSolve(a, b, coll)
 	return nil
--- we won't do anything with this function
 end
