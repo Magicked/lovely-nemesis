@@ -28,6 +28,7 @@ function player:init(x, y)
 	self.shape = love.physics.newRectangleShape(self.width, self.height)
 	self.fixture = love.physics.newFixture(self.body, self.shape, 1)
 	self.fixture:setRestitution(0.1)
+	self.body:setFixedRotation(true)
 
 	self.userData = {}
 	self.userData['id'] = self.id

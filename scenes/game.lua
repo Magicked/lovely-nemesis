@@ -34,10 +34,6 @@ function game:update(dt)
 	    end
 	end
 
-	if string.len(text) > 768 then    -- cleanup when 'text' gets too long
-        text = "" 
-    end
-
 	world:update(dt)
 end
 
@@ -45,7 +41,6 @@ function game:draw()
 	love.graphics.setColor(255, 255, 255)
 	love.graphics.draw(background, 0, 0, 0, .5)
     love.graphics.print("FPS: " .. love.timer.getFPS(), 50, 50)
-    love.graphics.print(text, 10, 10)
 
     camera:draw()
 	for k,bullet in ipairs(ent.projectile.bullet) do
