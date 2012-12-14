@@ -48,7 +48,7 @@ while running do
                     -- thankfully conversion is easy in lua.
                     x, y = tonumber(x), tonumber(y)
                     -- and finally we stash it away
-                    local ent = world[id] or {x=0, y=0}
+                    local ent = universe[id] or {x=0, y=0}
                     universe[id] = {x=ent.x+x, y=ent.y+y}
                 elseif cmd == 'at' then
                     local x, y = parms:match("^(%-?[%d.e]*) (%-?[%d.e]*)$")
