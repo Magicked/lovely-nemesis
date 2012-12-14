@@ -1,3 +1,6 @@
+require "entity"
+require "class"
+
 local socket = require "socket"
 local udp = socket.udp()
 
@@ -6,37 +9,58 @@ udp:setsockname('*', 42424)
 
 local universe = {}
 local data, msg_or_ip, port_or_nil
-local entity, cmd, parms
+local id, cmd, parms
 
 local running = true
 print "Beginning server loop."
 while running do
 	data, msg_or_ip, port_or_nil = udp:receivefrom()
     if data then
-        -- more of these funky match paterns!
-        entity, cmd, parms = data:match("^(%S*) (%S*) (.*)")
-        if cmd == 'move' then
-            local x, y = parms:match("^(%-?[%d.e]*) (%-?[%d.e]*)$")
-            assert(x and y) -- validation is better, but asserts will serve.
-            -- don't forget, even if you matched a "number", the result is still a string!
-            -- thankfully conversion is easy in lua.
-            x, y = tonumber(x), tonumber(y)
-            -- and finally we stash it away
-            local ent = world[entity] or {x=0, y=0}
-            world[entity] = {x=ent.x+x, y=ent.y+y}
-        elseif cmd == 'at' then
-            local x, y = parms:match("^(%-?[%d.e]*) (%-?[%d.e]*)$")
-            assert(x and y) -- validation is better, but asserts will serve.
-            x, y = tonumber(x), tonumber(y)
-            world[entity] = {x=x, y=y}
-        elseif cmd == 'update' then
-            for k, v in pairs(world) do
-                udp:sendto(string.format("%s %s %d %d", k, 'at', v.x, v.y), msg_or_ip,  port_or_nil)
-            end
-        elseif cmd == 'quit' then
-            running = false;
+        id, cmd, parms = data:match("^(%S*) (%S*) (.*)")
+        if id == nil then
+            udp:sendto("ERROR Unknown Command: id is nil\n", msg_or_ip, port_or_nil)
         else
-            print("unrecognised command:", cmd)
+            if universe[id] == nil then
+                -- Time to create the entity
+                local ent_obj = entity:new(id)
+                universe[id] = ent_obj
+                if cmd == 'login' then
+                    local name = parms:match("^([%w]+)$")
+                    if name ~= ''  and name ~= nil then
+                        ent_obj:set_position(100, 100)
+                        ent_obj:set_name(name)
+                        print ("User "..name.." connected!")
+                    else
+                        udp:sendto("ERROR Bad Username\n", msg_or_ip, port_or_nil)
+                    end
+                else
+                    udp:sendto("ERROR Unknown Command\n", msg_or_ip, port_or_nil)
+                end
+            else
+                if cmd == 'move' then
+                    local x, y = parms:match("^(%-?[%d.e]*) (%-?[%d.e]*)$")
+                    assert(x and y) -- validation is better, but asserts will serve.
+                    -- don't forget, even if you matched a "number", the result is still a string!
+                    -- thankfully conversion is easy in lua.
+                    x, y = tonumber(x), tonumber(y)
+                    -- and finally we stash it away
+                    local ent = world[id] or {x=0, y=0}
+                    universe[id] = {x=ent.x+x, y=ent.y+y}
+                elseif cmd == 'at' then
+                    local x, y = parms:match("^(%-?[%d.e]*) (%-?[%d.e]*)$")
+                    assert(x and y) -- validation is better, but asserts will serve.
+                    x, y = tonumber(x), tonumber(y)
+                    universe[id] = {x=x, y=y}
+                elseif cmd == 'update' then
+                    for k, v in pairs(world) do
+                        udp:sendto(string.format("%s %s %d %d", k, 'at', v.x, v.y), msg_or_ip,  port_or_nil)
+                    end
+                elseif cmd == 'quit' then
+                    running = false;
+                else
+                    print("unrecognised command:", cmd)
+                end
+            end
         end
     elseif msg_or_ip ~= 'timeout' then
         error("Unknown network error: "..tostring(msg))
