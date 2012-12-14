@@ -20,3 +20,11 @@ function defaultSoundSettings()
 		sfx = .5
 	}
 end
+
+-- Remove any final \n from a string.
+--   s: string to process
+-- returns
+--   s: processed string
+function chomp(s)
+    return gsub(s, "\n$", "")
+end

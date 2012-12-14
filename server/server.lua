@@ -1,5 +1,6 @@
 require "entity"
 require "class"
+require "utils"
 
 local socket = require "socket"
 local udp = socket.udp()
@@ -16,22 +17,25 @@ print "Beginning server loop."
 while running do
 	data, msg_or_ip, port_or_nil = udp:receivefrom()
     if data then
-        id, cmd, parms = data:match("^(%S*) (%S*) (.*)")
+        data = chomp(data)
+        id, cmd, parms = data:match("^(%S*) (%S*)[%s]*(.*)")
         if id == nil then
             udp:sendto("ERROR Unknown Command: id is nil\n", msg_or_ip, port_or_nil)
         else
+            print ("id is ", id, " - cmd is ", cmd, " - parms is ", parms)
             if universe[id] == nil then
                 -- Time to create the entity
                 local ent_obj = entity:new(id)
                 universe[id] = ent_obj
                 if cmd == 'login' then
-                    local name = parms:match("^([%w]+)$")
+                    local name = parms:match("^([%a]+)$")
                     if name ~= ''  and name ~= nil then
                         ent_obj:set_position(100, 100)
                         ent_obj:set_name(name)
                         print ("User "..name.." connected!")
                     else
                         udp:sendto("ERROR Bad Username\n", msg_or_ip, port_or_nil)
+                        print("Bad username: ", name)
                     end
                 else
                     udp:sendto("ERROR Unknown Command\n", msg_or_ip, port_or_nil)
