@@ -8,9 +8,17 @@ local udp = socket.udp()
 udp:settimeout(0)
 udp:setsockname('*', 42424)
 
+local entities = {}
 local universe = {}
 local data, msg_or_ip, port_or_nil
 local id, cmd, parms
+local update_frequency = 30 -- every 30 milliseconds
+local last_update_time = socket.gettime() * 1000
+local current_time = socket.gettime() * 1000
+
+-- Set our universe settings
+universe['world_size_x'] = 1000
+universe['world_size_y'] = 1000
 
 local running = true
 print "Beginning server loop."
@@ -23,10 +31,10 @@ while running do
             udp:sendto("ERROR Unknown Command: id is nil\n", msg_or_ip, port_or_nil)
         else
             print ("id is ", id, " - cmd is ", cmd, " - parms is ", parms)
-            if universe[id] == nil then
+            if entities[id] == nil then
                 -- Time to create the entity
                 local ent_obj = entity:new(id)
-                universe[id] = ent_obj
+                entities[id] = ent_obj
                 if cmd == 'login' then
                     local name = parms:match("^([%a]+)$")
                     if name ~= ''  and name ~= nil then
@@ -42,22 +50,27 @@ while running do
                 end
             else
                 if cmd == 'move' then
-                    local x, y = parms:match("^(%-?[%d.e]*) (%-?[%d.e]*)$")
-                    assert(x and y) -- validation is better, but asserts will serve.
+                    local x, y, angle, forcex, forcey = parms:match("^(%-?[%d.e]*) (%-?[%d.e]*) (%-?[%d.e]*) (%-?[%d.e]*) (%-?[%d.e]*)$")
+                    assert(x and y and angle and forcex and forcey) -- validation is better, but asserts will serve.
                     -- don't forget, even if you matched a "number", the result is still a string!
                     -- thankfully conversion is easy in lua.
-                    x, y = tonumber(x), tonumber(y)
-                    -- and finally we stash it away
-                    local ent = universe[id] or {x=0, y=0}
-                    universe[id] = {x=ent.x+x, y=ent.y+y}
-                elseif cmd == 'at' then
-                    local x, y = parms:match("^(%-?[%d.e]*) (%-?[%d.e]*)$")
-                    assert(x and y) -- validation is better, but asserts will serve.
-                    x, y = tonumber(x), tonumber(y)
-                    universe[id] = {x=x, y=y}
-                elseif cmd == 'update' then
-                    for k, v in pairs(world) do
-                        udp:sendto(string.format("%s %s %d %d", k, 'at', v.x, v.y), msg_or_ip,  port_or_nil)
+                    x, y, angle, forcex, forcey = tonumber(x), tonumber(y), tonumber(angle), tonumber(forcex), tonumber(forcey)
+                    entities[id]:set_position(x, y)
+                    entities[id]:set_angle(angle)
+                    entities[id]:set_force(forcex, forcey)
+                elseif cmd == 'fire' then
+                    -- <type> <x> <y> <angle> <forcex> <forcey>
+                    local w_type, x, y, angle, forcex, forcey = parms:match("^(%S+) (%-?[%d.e]*) (%-?[%d.e]*) (%-?[%d.e]*) (%-?[%d.e]*) (%-?[%d.e]*)$")
+                    assert(w_type and x and y and angle and forcex and forcey) -- validation is better, but asserts will serve.
+                    -- don't forget, even if you matched a "number", the result is still a string!
+                    -- thankfully conversion is easy in lua.
+                    x, y, angle, forcex, forcey = tonumber(x), tonumber(y), tonumber(angle), tonumber(forcex), tonumber(forcey)
+                    entities[id]:fire_weapon(w_type, x, y, angle, forcex, forcey)
+                elseif cmd == 'request_update' then
+                    local option = parms:match("^(%S+)$")
+                    assert(option)
+                    if option == 'world_size' then
+                        udp:sendto(string.format("world_size %d %d", universe[world_size_x], universe[world_size_y]), msg_or_ip, port_or_nil)
                     end
                 elseif cmd == 'quit' then
                     running = false;
@@ -69,7 +82,12 @@ while running do
     elseif msg_or_ip ~= 'timeout' then
         error("Unknown network error: "..tostring(msg))
     end
-   
+
+    -- is it time to send updates to clients?
+    if current_time - last_update_time > update_frequency then
+
+    end
+
     socket.sleep(0.01)
 end
 
